@@ -70,40 +70,62 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function calculateMonthlyRevenue(data) {
+                const monthNames = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+            
                 const monthlyRevenue = {};
-
+            
                 data.forEach(order => {
                     const { quantity, price, date } = order;
-                    const month = date.slice(0, 7);
+                    const monthIndex = new Date(date).getMonth();
+                    const monthName = monthNames[monthIndex];
                     const revenue = quantity * price;
-
-                    if (!monthlyRevenue[month]) {
-                        monthlyRevenue[month] = 0;
+            
+                    if (!monthlyRevenue[monthName]) {
+                        monthlyRevenue[monthName] = 0;
                     }
-
-                    monthlyRevenue[month] += revenue;
+            
+                    monthlyRevenue[monthName] += revenue;
                 });
-
-                return monthlyRevenue;
+            
+                const result = {};
+                for (const month of monthNames) {
+                    result[month] = monthlyRevenue[month] || 0;
+                }
+            
+                return result;
             }
+            
 
             function calculateMonthlyOrders(data) {
+                const monthNames = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
                 const monthlyOrders = {};
 
                 data.forEach(order => {
                     const { order_id, date } = order;
-                    const month = date.slice(0, 7);
+                    const monthIndex = new Date(date).getMonth();
+                    const monthName = monthNames[monthIndex];
 
-                    if (!monthlyOrders[month]) {
-                        monthlyOrders[month] = new Set();
+                    if (!monthlyOrders[monthName]) {
+                        monthlyOrders[monthName] = new Set();
                     }
 
-                    monthlyOrders[month].add(order_id);
+                    monthlyOrders[monthName].add(order_id);
                 });
 
                 const result = {};
-                for (const [month, orders] of Object.entries(monthlyOrders)) {
-                    result[month] = orders.size;
+                for (const month of monthNames) {
+                    if (monthlyOrders[month]) {
+                        result[month] = monthlyOrders[month].size;
+                    } else {
+                        result[month] = 0;
+                    }
                 }
 
                 return result;

@@ -132,12 +132,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
+            function calculateMonthlyPizzaSold(data) {
+              const monthNames = [
+                  "January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"
+              ];
+
+              const monthlyPizzaSold = {};
+
+              data.forEach(order => {
+                const { quantity, date } = order;
+                const monthIndex = new Date(date).getMonth();
+                const monthName = monthNames[monthIndex];
+        
+                // If this month hasn't been encountered yet, initialize its total to 0
+                if (!monthlyPizzaSold[monthName]) {
+                    monthlyPizzaSold[monthName] = 0;
+                }
+        
+                // Increment the total pizzas sold for this month by the quantity of the current order
+                monthlyPizzaSold[monthName] += parseInt(quantity);
+            });
+        
+            // Create the result object containing total pizzas sold for each month
+            const result = {};
+            for (const month of monthNames) {
+                result[month] = monthlyPizzaSold[month] || 0;
+            }
+        
+            return result;
+        }
 
             const monthlySalesByCategory = calculateMonthlySalesByCategory(team22);
             const monthlySalesByPizza = calculateMonthlySalesByPizza(team22);
             const monthlySalesBySize = calculateMonthlySalesBySize(team22);
             const monthlyRevenue = calculateMonthlyRevenue(team22);
             const monthlyOrders = calculateMonthlyOrders(team22);
+            const monthlyPizzaSold = calculateMonthlyPizzaSold (team22);
 
 
             function calculateTotalRevenue(data) {
@@ -233,11 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const ctx3 = document.getElementById('salesChart3').getContext('2d');
             const ctx4 = document.getElementById('salesChart4').getContext('2d');
             const ctx5 = document.getElementById('salesChart5').getContext('2d');
+            const ctx6 = document.getElementById('salesChart6').getContext('2d');
             let salesChart1;
             let salesChart2;
             let salesChart3;
             let salesChart4;
             let salesChart5;
+            let salesChart6;
 
             function updateChart() {
                 const selectedMonths = Array.from(document.querySelectorAll('.filter-container input:checked')).map(input => input.value);
@@ -265,6 +298,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const labels5 = Object.keys(monthlyOrders);
                 const data5 = Object.values(monthlyOrders);
 
+                const labels6 = Object.keys(monthlyPizzaSold)
+                const data6 = Object.values(monthlyPizzaSold);
+
+
                 if (salesChart1) {
                     salesChart1.destroy();
                 }
@@ -285,6 +322,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     salesChart5.destroy();
                 }
 
+                
+                if (salesChart6) {
+                  salesChart6.destroy();
+              }
+              
+
+
                 salesChart1 = new Chart(ctx1, {
                     type: 'pie',
                     data: {
@@ -292,14 +336,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         datasets: [{
                             label: 'Sales by Category',
                             data: data1,
-                            backgroundColor: labels1.map((_, i) => `hsl(${i * 360 / labels1.length}, 70%, 50%)`)
+                            backgroundColor: labels1.map((_, i) => `hsl(${i * 360 / labels1.length}, 70%, 50%)`),
+        
                         }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: 'black' // Set label text color to black
+                                }
+                            }
+                        }
                     }
-                });
+                }
+                    
+                );
 
                 salesChart2 = new Chart(ctx2, {
                     type: 'bar',
@@ -385,7 +439,34 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
-            }
+
+            salesChart6 = new Chart(ctx6, {
+              type: 'bar',
+              data: {
+                  labels: labels6,
+                  datasets: [{
+                      label: 'Monthly Pizza Sold',
+                      data: data6,
+                      backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                      borderColor: 'rgba(153, 102, 255, 1)',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                      y: {
+                          beginAtZero: true
+                      }
+                  }
+              }
+          });
+
+        }
+          
+    
+            
 
             function filterDataByMonths(data, selectedMonths) {
                 if (selectedMonths.length === 0) return data;
@@ -424,6 +505,76 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error fetching the sales data:', error));
 });
 
+//Slider JS
+const myslide = document.querySelectorAll('.myslide'),
+dot = document.querySelectorAll('.dot');
+let counter = 1;
+slidefun(counter);
+
+
+function plusSlides(n) {
+counter += n;
+slidefun(counter);
+    resetTimer();
+}
+function currentSlide(n) {
+    counter = n;
+    slidefun(counter);
+    resetTimer();
+}
+
+function slidefun(n) {
+let i;
+for(i = 0;i<myslide.length;i++){
+  myslide[i].style.display = "none";
+}
+for(i = 0;i<dot.length;i++) {
+  dot[i].className = dot[i].className.replace(' active', '');
+}
+if(n > myslide.length){
+ counter = 1;
+ }
+if(n < 1){
+ counter = myslide.length;
+ }
+myslide[counter - 1].style.display = "block";
+dot[counter - 1].className += " active";
+}
+
+//Slider JS Recomendation
+const myslideRec = document.querySelectorAll('.myslideRec'),
+dotRec = document.querySelectorAll('.dotRec');
+let counterRec = 1;
+slidefunRec(counterRec);
+
+function plusSlidesRec(n) {
+counterRec += n;
+slidefunRec(counterRec);
+    resetTimer();
+}
+function currentSlideRec(n) {
+    counterRec = n;
+    slidefunRec(counterRec);
+    resetTimer();
+}
+
+function slidefunRec(n) {
+let i;
+for(i = 0;i<myslideRec.length;i++){
+  myslideRec[i].style.display = "none";
+}
+for(i = 0;i<dotRec.length;i++) {
+  dotRec[i].className = dotRec[i].className.replace(' active', '');
+}
+if(n > myslideRec.length){
+ counterRec = 1;
+ }
+if(n < 1){
+ counterRec = myslideRec.length;
+ }
+myslideRec[counterRec - 1].style.display = "block";
+dotRec[counterRec - 1].className += " active";
+}
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get the modal
@@ -440,6 +591,7 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Modal, button, or close element not found!");
         return;
     }
+    
 
     // Variables for pagination
     let currentPage = 1;
@@ -520,14 +672,18 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // When the user clicks the button, open the modal and fetch data
     btn.onclick = function() {
         console.log("Button clicked");
         modal.style.display = "block";
         console.log("Modal display set to block");
         fetchAndDisplayData();
+        // Add a small delay to allow CSS transitions to be applied
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10); // Add a slight delay to trigger the transition
+        modal.querySelector('.modal-content').classList.add('show');
     }
-
+    
     // When the user clicks on <span> (x), close the modal
     span.onclick = function() {
         console.log("Close button clicked");
@@ -536,17 +692,49 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("modal-body").innerHTML = '';
         document.getElementById("pagination-controls").innerHTML = '';
         currentPage = 1; // Reset to the first page
+        modal.querySelector('.modal-content').classList.remove('show');
+        setTimeout(() => {
+            modal.classList.remove('show');
+        }, 300); // Match the transition duration in CSS
     }
-
+    
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
-        if (event.target == modal) {
+        if (event.target === modal) {
             console.log("Outside click detected");
             modal.style.display = "none";
             // Clear the modal body content
             document.getElementById("modal-body").innerHTML = '';
             document.getElementById("pagination-controls").innerHTML = '';
             currentPage = 1; // Reset to the first page
-        }
+        } 
     }
+
+
+    document.addEventListener( function() {
+        // Get all the anchor links in the header navigation
+        const links = document.querySelectorAll('.header-right a');
+    
+        // Add a click event listener to each link
+        links.forEach(link => {
+            link.addEventListener('click', function(event) {
+                // Prevent the default anchor behavior
+                event.preventDefault();
+    
+                // Get the target element's ID from the href attribute
+                const targetId = this.getAttribute('href').substring(1);
+    
+                // Get the target element by ID
+                const targetElement = document.getElementById(targetId);
+    
+                // Scroll to the target element smoothly
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+    
 });
+
+
